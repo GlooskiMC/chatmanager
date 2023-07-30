@@ -12,7 +12,7 @@
 # ░╚════╝░╚═╝░░╚═╝╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░░░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝╚═╝░░╚═╝░╚═════╝░╚══════╝╚═╝░░╚═╝
 
 # Created by: Jelloski & Gloozzy
-# Version: 1
+# Version: 1.1
 
 #---------------------------------#
 #            Features             #
@@ -43,12 +43,12 @@ options:
 	cooldown: 2 seconds
 
 # Permissions
-	mutechat-bypass: glooskiservices.mutechat.bypass
-	cooldown-bypass: glooskiservices.cooldown.bypass
-
 	staffchat-perms: glooskiservices.staffchat
 	mutechat-perms: glooskiservices.mutechat
 	clearchat-perms: glooskiservices.clearchat
+	
+	mutechat-bypass: glooskiservices.mutechat.bypass
+	cooldown-bypass: glooskiservices.cooldown.bypass
 
 # Do not edit below unless you know what you're doing.
 
@@ -63,7 +63,7 @@ on chat: # The actual chat system
 				cancel event
 		else:
 			if {@chatcooldown} is true:
-				player doesn't have permission "{@mutechat-bypass}"
+				player doesn't have permission "{@cooldown-bypass}"
 				set {_waited} to difference between {data::slowmode::%player's uuid%} and now
 				if {_waited} is less than 2 seconds:
 					send "{@prefix} &cYou must wait &c&l%difference between {@cooldown} and {_waited}% &cbefore chatting again" to the player
