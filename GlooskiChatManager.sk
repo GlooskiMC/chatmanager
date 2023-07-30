@@ -1,0 +1,113 @@
+# ░██████╗░██╗░░░░░░█████╗░░█████╗░░██████╗██╗░░██╗██╗░██████╗███████╗██████╗░██╗░░░██╗██╗░█████╗░███████╗░██████╗
+# ██╔════╝░██║░░░░░██╔══██╗██╔══██╗██╔════╝██║░██╔╝██║██╔════╝██╔════╝██╔══██╗██║░░░██║██║██╔══██╗██╔════╝██╔════╝
+# ██║░░██╗░██║░░░░░██║░░██║██║░░██║╚█████╗░█████═╝░██║╚█████╗░█████╗░░██████╔╝╚██╗░██╔╝██║██║░░╚═╝█████╗░░╚█████╗░
+# ██║░░╚██╗██║░░░░░██║░░██║██║░░██║░╚═══██╗██╔═██╗░██║░╚═══██╗██╔══╝░░██╔══██╗░╚████╔╝░██║██║░░██╗██╔══╝░░░╚═══██╗
+# ╚██████╔╝███████╗╚█████╔╝╚█████╔╝██████╔╝██║░╚██╗██║██████╔╝███████╗██║░░██║░░╚██╔╝░░██║╚█████╔╝███████╗██████╔╝
+# ░╚═════╝░╚══════╝░╚════╝░░╚════╝░╚═════╝░╚═╝░░╚═╝╚═╝╚═════╝░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░╚═╝░╚════╝░╚══════╝╚═════╝░
+# ░█████╗░██╗░░██╗░█████╗░████████╗███╗░░░███╗░█████╗░███╗░░██╗░█████╗░░██████╗░███████╗██████╗░
+# ██╔══██╗██║░░██║██╔══██╗╚══██╔══╝████╗░████║██╔══██╗████╗░██║██╔══██╗██╔════╝░██╔════╝██╔══██╗
+# ██║░░╚═╝███████║███████║░░░██║░░░██╔████╔██║███████║██╔██╗██║███████║██║░░██╗░█████╗░░██████╔╝
+# ██║░░██╗██╔══██║██╔══██║░░░██║░░░██║╚██╔╝██║██╔══██║██║╚████║██╔══██║██║░░╚██╗██╔══╝░░██╔══██╗
+# ╚█████╔╝██║░░██║██║░░██║░░░██║░░░██║░╚═╝░██║██║░░██║██║░╚███║██║░░██║╚██████╔╝███████╗██║░░██║
+# ░╚════╝░╚═╝░░╚═╝╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░░░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝╚═╝░░╚═╝░╚═════╝░╚══════╝╚═╝░░╚═╝
+
+# Created by: Jelloski & Gloozzy
+# Version: 1
+
+#---------------------------------#
+#            Features             #
+#                                 #
+#            Emoticons            #
+#          Chat Cooldown          #
+#           Staff Chat            #
+#           Clear Chat            #
+#            Mute Chat            #
+#                                 #
+#---------------------------------#
+
+options:
+
+# Change this to the prefix you want before the text.
+	prefix: &8[&b&lYourServer&8]
+
+# Change this to the prefix you want before the staffchat messages.
+	staffchat-prefix: &8[&b&lSTAFFCHAT&8]
+
+# Choose wether emoticons are on or not. (True = on, False = off)
+	emoticons: true
+
+# Choose to enable chat cooldown:
+	chatcooldown: true
+
+# Change this to how long you want chat cooldown to be.
+	cooldown: 2 seconds
+
+# Permissions
+	mutechat-bypass: glooskiservices.mutechat.bypass
+	cooldown-bypass: glooskiservices.cooldown.bypass
+
+	staffchat-perms: glooskiservices.staffchat
+	mutechat-perms: glooskiservices.mutechat
+	clearchat-perms: glooskiservices.clearchat
+
+# Do not edit below unless you know what you're doing.
+
+on chat: # The actual chat system
+	if {data::staffchat::%player's uuid%} is true:
+		cancel event
+		send formatted "{@staffchat-prefix} &7%player%&7 » &7%message%" to all players where [input has permission "{@staffchat-perms}"]
+	else:
+		if {data::mutechat} is true:
+			if player doesn't have permission "{@mutechat-bypass}":
+				send "{@prefix} &cThe chat is currently muted" to player
+				cancel event
+		else:
+			if {@chatcooldown} is true:
+				player doesn't have permission "{@mutechat-bypass}"
+				set {_waited} to difference between {data::slowmode::%player's uuid%} and now
+				if {_waited} is less than 2 seconds:
+					send "{@prefix} &cYou must wait &c&l%difference between {@cooldown} and {_waited}% &cbefore chatting again" to the player
+					cancel event
+					stop
+				set {data::slowmode::%player's uuid%} to now
+
+on chat: # Emoji System
+	if {@emoticons} is true:
+
+# You can add your own emoticons by copying this line and customizing it
+#		replace all ":text:" in message with "emoticon"
+
+		replace all ":skull:" or "💀" in message with "☠"
+		replace all ":shrug:" in message with "¯\_(ツ)_/¯"
+		replace all ":)" in message with "☺"
+		replace all ":(" in message with "☹"
+		replace all ":sus:" in message with "ඞ"
+
+command /staffchat [<player=%player%>]:
+	permission: {@staffchat-perms}
+	trigger:
+		if {data::staffchat::%arg-1's uuid%} is true:
+			set {data::staffchat::%arg-1's uuid%} to false
+			send "{@prefix} &cDisabled staff chat" to arg-1
+		else:
+			set {data::staffchat::%arg-1's uuid%} to true
+			send "{@prefix} &aEnabled staff chat" to arg-1
+
+command /clearchat:
+	permission: {@clearchat-perms}
+	permission message: {@prefix} You do not have permission to use this command
+	trigger:
+		loop 100 times:
+			send " " to all players
+		broadcast "{@prefix} &aChat has been cleared by %sender%"
+
+command /mutechat:
+	permission: {@mutechat-perms}
+	permission message: {@prefix} &cYou don't have permission to use this
+	trigger:
+		if {data::mutechat} is false:
+			set {data::mutechat} to true
+			broadcast "{@prefix} &cChat has been muted by %sender%"
+		else:
+			set {data::mutechat} to false
+			broadcast "{@prefix} &aChat has been unmuted by %sender%"
